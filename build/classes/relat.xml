@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE dao PUBLIC "DTD for Efreet DAO Configuration File 1.0//EN" "efreet-dao_1_0.dtd">
+
+<dao name="efreet-admin" datasource="oracle">
+<!-- $Id: efreet-relat.xml,v 1.1 2011/09/08 17:00:47 candrade Exp $ -->
+
+	<query name="qry">
+		<![CDATA[
+			select am.titulo from admin_menu am
+		]]>
+		<result index="1" type="CHAR">titulo</result>
+	</query>
+		
+</dao>

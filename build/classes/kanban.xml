@@ -1,0 +1,235 @@
+<?xml version="1.0"?>
+<!DOCTYPE dao PUBLIC "DTD for Efreet DAO Configuration File 1.0//EN" "efreet-dao_1_0.dtd">
+
+<dao name="efreet-kanban" datasource="redmine">
+<!-- $Id: efreet-kanban.xml,v 1.1.4.4.2.2.2.1 2011/10/06 14:12:12 candrade Exp $ -->
+
+	<query name="qryListaAtribuirA">
+		<![CDATA[
+			select distinct
+				   u.id,
+				   Concat(RTrim(u.firstname), ' ', RTrim(u.lastname)) as atribuirA,
+				   r.id, r.name
+			  from members m,
+				   users u,
+				   roles r,
+				   member_roles mr
+			 where project_id = ?
+			   and m.user_id = u.id
+			   and mr.role_id = r.id
+			   and mr.member_id = m.id
+			   and r.id in (3, 4, 6, 7)
+			   and u.firstname != ''
+			   and u.status = 1
+		  order by r.name, u.firstname
+		]]>
+		<parameter index="1" type="NUMBER">idProjeto</parameter>
+		<result index="1" type="NUMBER">id</result>
+		<result index="2" type="CHAR">atribuirA</result>
+		<result index="3" type="NUMBER">id_1</result>
+		<result index="4" type="CHAR">name</result>
+	</query>
+
+	<query name="qryListaKanban">
+		<![CDATA[
+			select i.id,
+				   i.subject,
+				   e.id,
+				   e.name,
+				   ist.id,
+				   ist.name,
+				   i.assigned_to_id,
+				   Concat(RTrim(u.firstname), ' ', RTrim(u.lastname)) as atribuidoA,
+				   u.mail,
+				   t.name,
+				   i.author_id,
+				   Concat(RTrim(uAuthor.firstname), ' ', RTrim(uAuthor.lastname)) as author,
+				   uAuthor.mail,
+				   p.name,
+				   v.name,
+				   v.description
+			  from projects p,
+			  	   versions v,
+				   enumerations e,
+			  	   issue_statuses ist,
+			  	   trackers t,
+			  	   issues i
+		 left join users u ON i.assigned_to_id = u.id
+		 left join users uAuthor ON  i.author_id = uAuthor.id
+			 where i.project_id = ?
+			   and p.id = i.project_id
+			   and i.priority_id = e.id
+			   and fixed_version_id = ?
+			   and v.id = fixed_version_id
+			   and i.status_id = ist.id
+			   and i.tracker_id = t.id
+		]]>
+		<parameter index="1" type="CHAR">idProjeto</parameter>
+		<parameter index="2" type="CHAR">idVersao</parameter>
+		<result index="1" type="NUMBER">id</result>
+		<result index="2" type="CHAR">subject</result>
+		<result index="3" type="NUMBER">id_1</result>
+		<result index="4" type="CHAR">name</result>
+		<result index="5" type="NUMBER">id_2</result>
+		<result index="6" type="CHAR">name_1</result>
+		<result index="7" type="NUMBER">assigned_to_id</result>
+		<result index="8" type="CHAR">atribuidoA</result>
+		<result index="9" type="CHAR">mail</result>
+		<result index="10" type="CHAR">name_2</result>
+		<result index="11" type="NUMBER">author_id</result>
+		<result index="12" type="CHAR">author</result>
+		<result index="13" type="CHAR">mail_1</result>
+		<result index="14" type="CHAR">name_3</result>
+		<result index="15" type="CHAR">name_4</result>
+		<result index="16" type="CHAR">description</result>
+	</query>
+
+	<query name="qryListaKanban_filtroFase" type="conditional">
+		<![CDATA[
+			and ist.id = ?
+		]]>
+		<parameter index="1" type="NUMBER">idFase</parameter>
+	</query>
+	
+	<query name="qryListaKanban_ORDER_BY" type="conditional">
+    	<![CDATA[
+    		order by ist.id, e.id
+    	]]>
+	</query>
+	
+	<query name="qryListaProjetosPublico">
+		<![CDATA[
+			select p.id,
+				   p.name
+			  from projects p
+			 order by name
+		]]>
+		<result index="1" type="CHAR">id</result>
+		<result index="2" type="CHAR">name</result>
+	</query>
+	
+	<query name="qryCountReteste">
+		<![CDATA[
+			select count(*) as count
+			  from journals j,
+			  	   journal_details jd
+			 where j.journalized_id = ?
+			   and jd.journal_id = j.id
+			   and jd.value = 18
+		]]>
+		<parameter index="1" type="CHAR">idTicket</parameter>
+		<result index="1" type="CHAR">count</result>
+	</query>
+
+	<query name="qryListaProjetos">
+		<![CDATA[
+			select p.id,
+				   p.name
+			  from members m,
+				   projects p
+			 where m.user_id = ?
+			   and p.id = m.project_id
+		  order by name
+		]]>
+		<parameter index="1" type="CHAR">id</parameter>
+		<result index="1" type="CHAR">id</result>
+		<result index="2" type="CHAR">name</result>
+	</query>
+	
+	<query name="qryListaFases">
+		<![CDATA[
+			 select id,
+					name,
+					position
+			   from issue_statuses
+			  where id in (${fasesIN})
+		   order by position
+		]]>
+		<parameter index="1" type="CHAR">fasesIN</parameter>
+		<result index="1" type="NUMBER">id</result>
+		<result index="2" type="CHAR">name</result>
+		<result index="3" type="NUMBER">position</result>
+	</query>
+	
+	<query name="qryListaVersoes">
+		<![CDATA[
+			select ve.id,
+				   ve.name,
+				   ve.description,
+				   (  select count(*)
+						from projects p,
+							 versions v,
+							 enumerations e,
+							 issue_statuses ist,
+							 trackers t,
+							 issues i
+				   left join users u ON i.assigned_to_id = u.id
+				   left join users uAuthor ON  i.author_id = uAuthor.id
+					   where i.project_id = ?
+						 and p.id = i.project_id
+						 and i.priority_id = e.id
+						 and fixed_version_id = ve.id
+						 and v.id = fixed_version_id
+						 and i.status_id = ist.id
+						 and i.tracker_id = t.id
+						 and i.status_id in (${fasesIN})
+					) as count
+			   from versions ve
+			  where ve.project_id = ?
+			    and ve.status = 'open'
+		   group by ve.id,
+					ve.name,
+					ve.description
+		   order by id desc LIMIT 0, 10
+		]]>
+		<parameter index="1" type="CHAR">idProjeto</parameter>
+		<parameter index="2" type="CHAR">idProjeto</parameter>
+		<parameter index="3" type="CHAR">fasesIN</parameter>
+		<result index="1" type="CHAR">id</result>
+		<result index="2" type="CHAR">name</result>
+		<result index="3" type="CHAR">description</result>
+		<result index="4" type="CHAR">count</result>
+	</query>
+	
+	<query name="qryBuscaUsuario">
+		<![CDATA[
+			  select id,
+				    login,
+				    hashed_password,
+				    firstname,
+				    lastname,
+				    mail,
+				    admin,
+				    status,
+				    last_login_on,
+				    language,
+				    auth_source_id,
+				    created_on,
+				    updated_on,
+				    type,
+				    identity_url,
+				    mail_notification
+				from users
+				where login = ?
+		]]>
+		<parameter index="1" type="CHAR">login</parameter>
+		<result index="1" type="NUMBER">id</result>
+		<result index="2" type="CHAR">login</result>
+		<result index="3" type="CHAR">hashed_password</result>
+		<result index="4" type="CHAR">firstname</result>
+		<result index="5" type="CHAR">lastname</result>
+		<result index="6" type="CHAR">mail</result>
+		<result index="7" type="CHAR">admin</result>
+		<result index="8" type="NUMBER">status</result>
+		<result index="9" type="DATE">last_login_on</result>
+		<result index="10" type="CHAR">language</result>
+		<result index="11" type="NUMBER">auth_source_id</result>
+		<result index="12" type="DATE">created_on</result>
+		<result index="13" type="DATE">updated_on</result>
+		<result index="14" type="CHAR">type</result>
+		<result index="15" type="CHAR">identity_url</result>
+		<result index="16" type="CHAR">mail_notification</result>
+		
+	</query>
+	
+</dao>

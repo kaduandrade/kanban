@@ -1,0 +1,89 @@
+﻿<project name="Kanban" default="all">
+
+    <!-- Project settings -->
+	<property file="build.properties" />
+	<property name="project.title" value="KanbanBionexo"/>
+    <property name="project.distname" value="KanbanBionexo"/>
+    <property name="project.version" value="1.0"/>
+	<property name="deploy.home" value="${work.home}/WebContent"/>
+	<property name="distpath.project" value="${work.home}/deploy"/>
+	<property environment="env" />
+		
+	<!-- Controle de versão do WAR -->
+	<condition property="version.build" value="${project.version}" else="1.${env.BUILD_NUMBER}">
+		<equals arg1="${env.BUILD_NUMBER}" arg2="$${env.BUILD_NUMBER}"/>
+	</condition>
+	<condition property="version.branch" value="HEAD" else="1.${env.CVS_BRANCH}">
+		<equals arg1="${env.CVS_BRANCH}" arg2="$${env.CVS_BRANCH}"/>
+	</condition>
+	
+	<!-- Classpath settings -->
+	<path id="compile.classpath">
+	  <fileset dir="${tomcat.home}/lib">
+	    <include name="*.jar"/>
+	  </fileset>
+	  <fileset dir="${work.home}/WebContent/WEB-INF/lib">
+	    <include name="*.jar"/>
+	  </fileset>		
+	  <pathelement location="${work.home}/WebContent/WEB-INF/classes"/>
+	  <fileset dir="${work.home}/WebContent/WEB-INF/lib">
+	    <include name="*.jar"/>
+	  </fileset>  
+	  <pathelement path ="${classpath}"/>
+	</path>
+
+    <!-- Check timestamp on files -->
+    <target name="prepare">
+        <tstamp/>
+    </target>
+
+    <!-- Copy any resource or configuration files -->
+    <target name="resources">
+        <copy todir="${deploy.home}/WEB-INF/classes" includeEmptyDirs="no">
+            <fileset dir="${source.home}">
+            <patternset>
+                <include name="**/*.conf"/>
+                <include name="**/*.properties"/>
+                <include name="**/*.xml"/>
+                <include name="**/*.dtd"/>
+            </patternset>
+            </fileset>
+        </copy>
+    </target>	
+	
+    <!-- Normal build of application -->
+    <target name="compile" depends="prepare, resources">
+        <echo>Compiling to ${work.home}</echo>    	
+        <javac srcdir="${source.home}" destdir="${work.home}/WebContent/WEB-INF/classes" debug="true" debuglevel="lines,vars">
+            <classpath refid="compile.classpath"/>        	        	        	
+        </javac>    	
+    </target>
+
+
+    <!-- Remove classes directory for clean build -->
+    <target name="clean"
+      description="Prepare for clean build">
+      <delete dir="${work.home}/WebContent/WEB-INF/classes"/>
+      <mkdir  dir="${work.home}/WebContent/WEB-INF/classes"/>
+    </target>
+
+	
+	<!-- Generate a War file for the project -->
+	<target name="dist" depends="compile" 
+		description="Generate a WAR for the application">
+
+	    <delete dir="${distpath.project}"/>
+	    <mkdir dir="${distpath.project}"/>
+		
+		<war
+	        basedir="${deploy.home}"
+	        warfile="${distpath.project}/${project.distname}.${version.build}.war"
+	        webxml="${deploy.home}/WEB-INF/web.xml">
+	        <exclude name="${distpath.project}/${project.distname}.war"/>
+	    </war>
+	</target>
+	
+    <!-- Build entire project -->
+    <target name="all" depends="clean, prepare, compile"/>
+
+</project>

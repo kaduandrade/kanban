@@ -1,0 +1,117 @@
+@CHARSET "UTF-8";
+
+body{
+	font: 10px Helvetica, sans-serif;
+	background:#fff;
+	text-align:center;
+	color: #555;
+	}
+
+.toggleLink, .todos {
+	
+		font-size:0.94em;		
+		padding-left: 8px;
+		color: #cc0000;
+		cursor: pointer;
+		position: relative;
+		float: left;
+		top: -9px;
+		
+	}
+	
+	.todos {
+	
+		font-size:0.74em;		
+		padding: 4px;
+		margin-bottom: 20px;
+		
+	}
+
+	#slick-slidetoggle {
+	
+		padding-left: 14px;
+		color: #efefef;
+		font-weight: bold;
+		text-transform: uppercase;
+
+	}
+
+	#topo {
+	
+		padding: 4px;
+		width: 620px;
+
+	}
+
+	.odd {
+	
+		background-color:#efefef;
+
+	}
+			
+			#bloqueados {
+				width: 560px;
+				padding: 0;
+				margin: 0;
+				color: #333;
+				border: 1px;
+				border-color: #efefef;
+			}
+			
+			caption {
+				padding: 4px;
+				width: 580px;	 
+				font: bold 13px Arial, Helvetica, sans-serif;
+				text-align: left;
+				color: #cc0000;
+			}
+			
+			#accordion {
+			    list-style: none;
+			    padding: 0 0 0 0;
+			    width: 580px;
+			    
+			}
+			
+			#accordion div {
+			    display: block;
+			    background-color: #efefef;
+			    font-weight: bold;
+			    margin: 1px;
+			    cursor: pointer;
+			    padding: 5 5 5 7px;
+			    list-style: circle;
+			    -moz-border-radius: 10px;
+			    -webkit-border-radius: 10px;
+			    border-radius: 10px;
+			}
+			
+			#accordion ul {
+			    list-style: none;
+			    padding: 0 0 0 0;
+			}
+			
+			#accordion ul{
+			    display: none;
+			    margin-left: 10px;
+			    margin-top: 6px;
+			    line-height: 24px;
+			    color: #333;
+			}
+			
+			#accordion ul li {
+			    font-weight: normal;
+			    cursor: auto;
+			    background-color: #fff;
+			    padding: 4px;
+			    margin-left: 14px;
+			    line-height: 12px;
+			}
+			
+			#accordion a {
+			    text-decoration: none;
+			}
+			
+			#accordion a:hover {
+			    text-decoration: underline;
+			}
